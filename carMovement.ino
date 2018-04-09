@@ -6,20 +6,20 @@ const int rightDegrees = 65;                   //degrees to turn right
 
 //driving methods//
 void driveForward(){
-  car.setSpeed(fSpeed);
+  car.setSpeed(fordwardSpeed);
   car.setAngle(0);
 }
 void driveBackward(){
-  car.setSpeed(bSpeed);
+  car.setSpeed(backwardSpeed);
   car.setAngle(0);
 }
 void driveLeft(){
-   car.setSpeed(fSpeed);
-   car.setAngle(lDegrees);
+   car.setSpeed(forwardSpeed);
+   car.setAngle(leftDegrees);
 }
 void driveRight(){
-  car.setSpeed(fSpeed);
-  car.setAngle(rDegrees);
+  car.setSpeed(forwardSpeed);
+  car.setAngle(rightDegrees);
 }
 void stopCar(){
   car.setSpeed(0);
