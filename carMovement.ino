@@ -1,8 +1,8 @@
 //attributes//
-const int forwardSpeed = 30;                   //Speed forward
-const int backwardSpeed = -30;                 //Speed backward
-const int leftDegrees = -65;                   //degrees to turn left
-const int rightDegrees = 65;                   //degrees to turn right
+int forwardSpeed = 30;                   //Speed forward
+int backwardSpeed = -30;                 //Speed backward
+int leftDegrees = -65;                   //degrees to turn left
+int rightDegrees = 65;                   //degrees to turn right
 
 //driving methods//
 void driveForward(){
