@@ -20,6 +20,14 @@ const int sideFrontPinForIR = A0;
 const int encoderLeftPin = 2;
 const int encoderRightPin = 3;
 
+int frontDistanceInCm;
+int backDistanceInCm;
+int irDistanceInCm;                      
+int maxFrontDistance = 25;               
+int maxBackDistance = 25;
+int maxSideDistance = 20;
+int odometerLeftDistance, odometerRightDistance;
+
 int spotSize;
 
 void setup() {
@@ -62,34 +70,6 @@ void handleInput() {
   }
 }
 
-////// methods for moving the car //////
-void driveForward(){
-  car.setSpeed(forwardSpeed);
-  car.setAngle(0);
-}
-void driveBackward(){
-  car.setSpeed(backwardSpeed);
-  car.setAngle(0);
-}
-void driveLeft(){
-   car.setSpeed(forwardSpeed);
-   car.setAngle(leftDegrees);
-}
-void driveRight(){
-  car.setSpeed(forwardSpeed);
-  car.setAngle(rightDegrees);
-}
-void stopCar(){
-  car.setSpeed(0);
-}
-
-void attachBeginOdometer(){
-  encoderLeft.attach(encoderLeftPin);
-  encoderRight.attach(encoderRightPin);
-  encoderLeft.begin();
-  encoderRight.begin();
-}
-
 //to use park in spot we need to use the findSpot method first (as it is now)
 void parkInSpot(){ //need delay 1000 in many places or else it will not turn as it should
   rotateOnSpot(-35);
@@ -130,6 +110,52 @@ void findSpotAndPark(){ //need to add findSpot() method to use this
   parkInSpot();
 }
 
+////// methods for moving the car //////
+void driveForward(){
+  car.setSpeed(forwardSpeed);
+  car.setAngle(0);
+}
+void driveBackward(){
+  car.setSpeed(backwardSpeed);
+  car.setAngle(0);
+}
+void driveLeft(){
+   car.setSpeed(forwardSpeed);
+   car.setAngle(leftDegrees);
+}
+void driveRight(){
+  car.setSpeed(forwardSpeed);
+  car.setAngle(rightDegrees);
+}
+void stopCar(){
+  car.setSpeed(0);
+}
+
+void attachBeginOdometer(){
+  encoderLeft.attach(encoderLeftPin);
+  encoderRight.attach(encoderRightPin);
+  encoderLeft.begin();
+  encoderRight.begin();
+}
+
+//methods to get distances from sensors
+void getFrontDistance(){
+  frontDistanceInCm = frontSonar.getDistance(); 
+}
+void getBackDistance(){
+  backDistanceInCm = backSonar.getDistance();
+}
+void getIRdistance(){
+  irDistanceInCm = sideFrontIR.getDistance();
+}
+void getOdometerLeftDistance(){
+  odometerLeftDistance = encoderLeft.getDistance();
+}
+void getOdometerRightDistance(){
+  odometerRightDistance = encoderRight.getDistance();
+}
+
+//method to make the car turn
 void rotateOnSpot(int targetDegrees) {
   targetDegrees %= 360; 
   if (!targetDegrees){
