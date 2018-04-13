@@ -37,3 +37,38 @@ void driveRight(){
 void stopCar(){
   car.setSpeed(0);
 }
+
+void parkInSpot(){ //need delay 1000 in many places or else it will not turn as it should
+  rotateOnSpot(-35);
+  Serial3.print("After rotation");
+  delay(200);
+  getBackDistance();
+
+  int lengthToGoBack = (spotSize / 3)+5; //weird, cuz the size of the spot comes out as very long
+  
+  if(lengthToGoBack < 5 || lengthToGoBack > 30){
+    delay(200);
+    Serial.print(lengthToGoBack);
+    delay(200);
+  }
+  else{
+    car.go(-lengthToGoBack); //car.go(-25);
+    while(car.getSpeed() > 0) {  
+    }
+    stopCar();
+    delay(1000);
+    rotateOnSpot(35);
+    
+    //int turn = gyro.getAngularDisplacement();
+   /* if(turn < 0){ //Idk if this if else is correct
+      rotateOnSpot(-(turn));
+    }else if(turn > 0){
+      rotateOnSpot(-turn);
+    } */ 
+    delay(1000);
+    //findMiddle();
+    //while(car.getSpeed() > 0) {  
+    //}
+  }
+}
+
