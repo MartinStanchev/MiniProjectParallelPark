@@ -1,20 +1,44 @@
 #include <Smartcar.h>
 
 Car car;
+SR04 frontSonar;
+SR04 backSonar;
+GP2Y0A21 sideFrontIR;                    //can only measure between 5 and 25 cm, closer or futher than that is 0 (ithink) other naem:GP2D120
+Odometer encoderLeft, encoderRight;
+Gyroscope gyro;
 
-const int forwardSpeed = 50;                   //Speed forward
-const int backwardSpeed = -50;                  //Speed backward
+const int forwardSpeed = 30;                   //Speed forward
+const int backwardSpeed = -30;                  //Speed backward
 const int leftDegrees = -65;               //degrees to turn left
 const int rightDegrees = 65;                //degrees to turn right
 
+const int frontTrigPin = 6; 
+const int frontEchoPin = 7;
+const int backTrigPin = A9;
+const int backEchoPin = A10;
+const int sideFrontPinForIR = A0;
+const int encoderLeftPin = 2;
+const int encoderRightPin = 3;
+
+int spotSize;
+
 void setup() {
-  // put your setup code here, to run once:
+  Serial3.begin(9600);
+  gyro.attach();   
+  
+  //attaching pins                     
+  frontSonar.attach(frontTrigPin,frontEchoPin);
+  backSonar.attach(backTrigPin, backEchoPin);
+  sideFrontIR.attach(sideFrontPinForIR);
+  attachBeginOdometer();
+
+  car.begin(gyro);
+  car.begin(encoderLeft, encoderRight);
 
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-
+  handleInput(); //plz add this method to this file
 }
 
 ////// methods for moving the car //////
@@ -38,6 +62,14 @@ void stopCar(){
   car.setSpeed(0);
 }
 
+void attachBeginOdometer(){
+  encoderLeft.attach(encoderLeftPin);
+  encoderRight.attach(encoderRightPin);
+  encoderLeft.begin();
+  encoderRight.begin();
+}
+
+//to use park in spot we need to use the findSpot method first (as it is now)
 void parkInSpot(){ //need delay 1000 in many places or else it will not turn as it should
   rotateOnSpot(-35);
   Serial3.print("After rotation");
@@ -72,3 +104,31 @@ void parkInSpot(){ //need delay 1000 in many places or else it will not turn as 
   }
 }
 
+void rotateOnSpot(int targetDegrees) {
+  targetDegrees %= 360; 
+  if (!targetDegrees){
+     return; 
+  }
+  if (targetDegrees > 0) { 
+    car.setMotorSpeed(forwardSpeed, -forwardSpeed); 
+  } else { 
+    car.setMotorSpeed(-forwardSpeed, forwardSpeed); 
+  }
+  
+  unsigned int initialHeading = gyro.getAngularDisplacement(); 
+  int degreesTurnedSoFar = 0; 
+  
+  while (abs(degreesTurnedSoFar) < abs(targetDegrees)) { 
+    gyro.update();
+    int currentHeading = gyro.getAngularDisplacement(); 
+    
+    if ((targetDegrees < 0) && (currentHeading > initialHeading)) { 
+      currentHeading -= 360; 
+    } else if ((targetDegrees > 0) && (currentHeading < initialHeading)) {
+      currentHeading += 360;
+    }
+    
+    degreesTurnedSoFar = initialHeading - currentHeading;   
+  }
+  stopCar(); 
+}
