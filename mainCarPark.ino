@@ -125,6 +125,11 @@ void parkInSpot(){ //need delay 1000 in many places or else it will not turn as 
   }
 }
 
+void findSpotAndPark(){ //need to add findSpot() method to use this
+  findSpot();
+  parkInSpot();
+}
+
 void rotateOnSpot(int targetDegrees) {
   targetDegrees %= 360; 
   if (!targetDegrees){
