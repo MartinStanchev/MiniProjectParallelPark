@@ -38,7 +38,28 @@ void setup() {
 }
 
 void loop() {
-  handleInput(); //plz add this method to this file
+  handleInput(); 
+}
+
+void handleInput() {
+  if (Serial3.available()) {
+    char input = Serial3.read();
+   
+    switch (input) {
+      case 's':               
+        findSpot();           
+        break;
+      case 'p':               
+        parkInSpot();      
+        break;
+      case 'a':
+        findSpotAndPark();
+        break;
+
+      default:
+        stopCar();
+    }
+  }
 }
 
 ////// methods for moving the car //////
