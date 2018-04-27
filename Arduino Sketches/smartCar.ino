@@ -11,7 +11,7 @@ Gyroscope gyro(-5);
 
 
 const int fSpeed = 30; //70% of the full speed forward
-const int bSpeed = -30; //70% of the full speed backward
+const int bSpeed = -35; //70% of the full speed backward
 const int lDegrees = -75; //degrees to turn left
 const int rDegrees = 75; //degrees to turn right
 
@@ -39,10 +39,10 @@ int frontDistanceInCm;
 int sideDistanceInCm;
 int irDistanceInCm;  
 
-int maxBackDistance = 10;
-int maxFrontDistance = 10; 
+int maxBackDistance = 8;
+int maxFrontDistance = 20; 
 int maxSideDistance = 10;
-int maxIrbackDistance = 6; 
+int maxIrbackDistance = 8; 
 
 int pos = 0; // variable to store the servo position
 int const offset = -5;
