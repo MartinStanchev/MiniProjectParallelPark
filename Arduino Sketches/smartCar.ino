@@ -103,6 +103,7 @@ void findSpot(){
   while(car.getSpeed()!= 0) {
     
      rightDistance = sideSonar.getMedianDistance();
+     frontDistanceInCm = frontSonar.getDistance();
      
      
     if(rightDistance == 0 || rightDistance > 30){ 
