@@ -191,21 +191,28 @@ void driveBackward(){
  
  }
  
-void parkInSpot(){  //need delay 1000 in many places or else it will not turn as it should
-//  double value = (double) (spotSize/2)/(sideDistanceInCm + 15); 
-//  int rotateDegree = -(90-atan(value)/3.14*180);   We do NOT use this !
-int rotateDegree; 
+void parkInSpot(){
+double value = (double)(spotSize/2)/(sideDistanceInCm + 15);
+     Serial3.println("Value is");
+     Serial3.println(value);
+int angle = ((double) atan(value)/3.14)*180;
+     Serial3.println("Angle is");
+     Serial3.println(angle);
+int rotateDegree = -(80-angle);   //We do NOT use this !
+     Serial3.println(rotateDegree);
+
+//int rotateDegree; 
   gyro.update();
   Serial3.println(gyro.getAngularDisplacement());
   
-  if(sideDistanceInCm > 10){
-     rotateDegree = -35;
+  if(sideDistanceInCm > 13){
+     //rotateDegree = -35;
      Serial3.println("side distance is ");
      Serial3.println(sideDistanceInCm);
   rotateOnSpot(rotateDegree);
   }
   else{
-    rotateDegree = -25;
+    //rotateDegree = -35;
     Serial3.println("side distance is ");
      Serial3.println(sideDistanceInCm);
     rotateOnSpot(rotateDegree);
@@ -220,14 +227,13 @@ int rotateDegree;
   
 //  sqrt(pow((spotSize/3),2)+pow((sideDistanceInCm),2)); //weird, cuz the size of the spot comes out as very long
 
-  delay(2000);
+  delay(3000);
   
    car.rotate(-(rotateDegree/3));
-   
-   delay(2000);
   
-//   car.setSpeed(25);
-   middlePark();
+  delay(2000);
+  
+  middlepark();
 
 }
 
