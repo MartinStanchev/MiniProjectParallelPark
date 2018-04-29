@@ -198,14 +198,14 @@ int rotateDegree;
   gyro.update();
   Serial3.println(gyro.getAngularDisplacement());
   
-  if(sideDistanceInCm > 13){
+  if(sideDistanceInCm > 10){
      rotateDegree = -35;
      Serial3.println("side distance is ");
      Serial3.println(sideDistanceInCm);
   rotateOnSpot(rotateDegree);
   }
   else{
-    rotateDegree = -35;
+    rotateDegree = -25;
     Serial3.println("side distance is ");
      Serial3.println(sideDistanceInCm);
     rotateOnSpot(rotateDegree);
@@ -214,15 +214,20 @@ int rotateDegree;
   gyro.update();
   Serial3.println(gyro.getAngularDisplacement());
   
-  delay(1000);
+  delay(3000);
   
  driveBackward();
   
 //  sqrt(pow((spotSize/3),2)+pow((sideDistanceInCm),2)); //weird, cuz the size of the spot comes out as very long
 
-  delay(1000);
+  delay(2000);
   
    car.rotate(-(rotateDegree/3));
+   
+   delay(2000);
+  
+//   car.setSpeed(25);
+   middlePark();
 
 }
 
@@ -268,3 +273,19 @@ void straightenCar() {
   }
   
 }
+
+void middlePark(){
+  int frontDistance = frontSonar.getMedianDistance();
+  Serial3.println("the front distance is");
+  Serial3.println(frontDistance);
+  int backDistance = backSonar.getMedianDistance();
+  Serial3.println("the back distance is");
+  Serial3.println(backDistance);
+  
+  int distanceToGo =  frontDistance - backDistance ;
+  Serial3.println("the To GO distance is");
+  Serial3.println(distanceToGo/2);
+  delay(300);
+  car.go((distanceToGo/4));
+}
+
