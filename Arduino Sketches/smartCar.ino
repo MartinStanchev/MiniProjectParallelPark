@@ -1,4 +1,5 @@
 #include <Smartcar.h>
+#include<math.h>
 
 
 Car car;
@@ -11,12 +12,12 @@ Gyroscope gyro(-5);
 
 
 const int fSpeed = 30; //70% of the full speed forward
-const int bSpeed = -35; //70% of the full speed backward
+const int bSpeed = -25; //70% of the full speed backward
 const int lDegrees = -75; //degrees to turn left
 const int rDegrees = 75; //degrees to turn right
 
 Odometer encoderLeft(210), encoderRight(210);
-//Servo myservo;
+Servo myservo;
 
 const int frontTrigPin = 6; 
 const int frontEchoPin = 7;
@@ -31,7 +32,7 @@ const int encoderLeftPin = 2;
 const int encoderRightPin = 3;
 
 
-//const int SERVO_PIN = 50;
+const int SERVO_PIN = 50;
 
 int spotSize;
 int backDistanceInCm;
@@ -39,7 +40,7 @@ int frontDistanceInCm;
 int sideDistanceInCm;
 int irDistanceInCm;  
 
-int maxBackDistance = 8;
+int maxBackDistance = 15;
 int maxFrontDistance = 20; 
 int maxSideDistance = 10;
 int maxIrbackDistance = 8; 
@@ -58,7 +59,7 @@ void setup() {
   frontSonar.attach(frontTrigPin,frontEchoPin);
   encoderLeft.attach(encoderLeftPin);
   encoderRight.attach(encoderRightPin);
-//  myservo.attach(SERVO_PIN);
+  myservo.attach(SERVO_PIN);
   backIR.attach(backIrPin);
   car.begin(encoderLeft,encoderRight);
   car.begin(gyro);
@@ -83,7 +84,7 @@ void handleInput() { //handle serial input if there is any
         break;
       case 's': //go ahead
         car.setSpeed(fSpeed);
-        car.setAngle(0);
+        car.setAngle(12);
         findSpot();
         break;
       case 'p': //go back
@@ -126,17 +127,11 @@ void findSpot(){
        
        if(totalLengthLeft > ENOUGH_SPACE || totalLengthRight > ENOUGH_SPACE) {
         car.setSpeed(0);
+        car.setSpeed(0);
         Serial3.println("Stop waiting to park");
-//        spotSize = totalLengthLeft; should do a comparision between 
-//  the left and right distance from the odometer!! 
-
-        sideDistanceInCm = sideSonar.getDistance();
-        delay(1000);
-        car.go(-9);
+        spotSize = fmin(totalLengthLeft,totalLengthRight);
         break;
-      } else {
-          Serial3.println(" The spot length is not long Enough ");
-        }
+      } 
     }
     else {
       Serial3.println(" NO spot detected ! ");
@@ -149,24 +144,23 @@ void findSpot(){
  
 }
 
-void driveBackward(){
+void driveBackwardOnSpot(){
   
   irDistanceInCm = backIR.getDistance();
   backDistanceInCm = backSonar.getDistance();
   
-  Serial3.println("Distance of IR sensor is "); 
+  myservo.write(0);
+  delay(500);
   
-  if((irDistanceInCm > maxIrbackDistance || irDistanceInCm == 0) && (backDistanceInCm > maxBackDistance || backDistanceInCm ==0)){
+    if((backIR.getMedianDistance() > maxIrbackDistance  || backIR.getMedianDistance()==0) && (backSonar.getMedianDistance() > maxBackDistance || backSonar.getMedianDistance() ==0)){
     
     car.setSpeed(bSpeed);
     car.setAngle(0);
 
-    
     while(car.getSpeed()< 0){
-      irDistanceInCm = backIR.getDistance();
-      backDistanceInCm = backSonar.getDistance();
-      Serial3.println(irDistanceInCm);
-      if((irDistanceInCm < maxIrbackDistance  && irDistanceInCm !=0)||(backDistanceInCm < maxBackDistance && backDistanceInCm !=0)){
+//      irDistanceInCm = backIR.getMedianDistance();
+//      backDistanceInCm = backSonar.getMedianDistance();
+      if((backIR.getMedianDistance() < maxIrbackDistance  && backIR.getMedianDistance()!=0)||(backSonar.getMedianDistance() < maxBackDistance && backSonar.getMedianDistance() !=0)){
         car.setSpeed(0); 
         break;
       }
@@ -178,53 +172,36 @@ void driveBackward(){
     car.setSpeed(0);
     Serial3.println("I can NOT Man, I will Crash! ");
   }
+
+  delay(500);
+  myservo.write(55);
   
  
  }
  
 void parkInSpot(){
-double value = (double)(spotSize/2)/(sideDistanceInCm + 15);
-     Serial3.println("Value is");
-     Serial3.println(value);
-int angle = ((double) atan(value)/3.14)*180;
-     Serial3.println("Angle is");
-     Serial3.println(angle);
-int rotateDegree = -(80-angle);   //We do NOT use this !
-     Serial3.println(rotateDegree);
 
-//int rotateDegree; 
+  int rotateDegree = -35;  
   gyro.update();
   Serial3.println(gyro.getAngularDisplacement());
-  
-  if(sideDistanceInCm > 13){
-     //rotateDegree = -35;
-     Serial3.println("side distance is ");
-     Serial3.println(sideDistanceInCm);
-  rotateOnSpot(rotateDegree);
-  }
-  else{
-    //rotateDegree = -35;
-    Serial3.println("side distance is ");
-     Serial3.println(sideDistanceInCm);
-    rotateOnSpot(rotateDegree);
-  }
-  
-  gyro.update();
-  Serial3.println(gyro.getAngularDisplacement());
-  
-  delay(3000);
-  
- driveBackward();
-  
-//  sqrt(pow((spotSize/3),2)+pow((sideDistanceInCm),2)); //weird, cuz the size of the spot comes out as very long
-
-  delay(3000);
-  
-   car.rotate(-(rotateDegree/3));
-  
+  driveBack();
   delay(2000);
-  
-  middlepark();
+  rotateOnSpot(rotateDegree/2);
+  gyro.update();
+  Serial3.println(gyro.getAngularDisplacement());
+  delay(1000);
+  rotateOnSpot(rotateDegree/2);
+  delay(2000);
+  driveBackwardOnSpot();
+  delay(3000);
+  rotateOnSpot(-rotateDegree/3);
+  delay(1000);
+  rotateOnSpot(-rotateDegree/3);
+//  delay(1000);
+//  rotateOnSpot(-rotateDegree/4);
+
+  delay(2000);
+  middlePark();
 
 }
 
@@ -284,5 +261,19 @@ void middlePark(){
   Serial3.println(distanceToGo/2);
   delay(300);
   car.go((distanceToGo/4));
+}
+
+void driveBack(){
+  sideDistanceInCm = sideSonar.getMedianDistance();
+  while(sideDistanceInCm < 30 && sideDistanceInCm != 0){
+    car.go(-2);
+    sideDistanceInCm = sideSonar.getMedianDistance();
+    delay(200);
+  }
+  delay(300);
+  sideDistanceInCm = sideSonar.getMedianDistance();
+  if(sideDistanceInCm < 30 && sideDistanceInCm != 0)
+  car.go(-3);
+  
 }
 
