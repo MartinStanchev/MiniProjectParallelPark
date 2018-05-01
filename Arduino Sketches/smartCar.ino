@@ -97,35 +97,26 @@ void handleInput() { //handle serial input if there is any
 }
 
 void findSpot(){
-  const int ENOUGH_SPACE = 50;
+  const int ENOUGH_SPACE = 45;
   int spotStartLeft,spotStartRight,spotEndRight,spotEndLeft,rightDistance,totalLengthLeft, totalLengthRight;
 
   while(car.getSpeed()!= 0) {
     
      rightDistance = sideSonar.getMedianDistance();
-     frontDistanceInCm = frontSonar.getDistance();
-     
-     
     if(rightDistance == 0 || rightDistance > 30){ 
-      
        encoderLeft.begin();
        encoderRight.begin();
-       Serial3.println(" WOW let me check this Spot!");
-       spotStartLeft = encoderLeft.getDistance();
-       spotStartRight = encoderLeft.getDistance();
        
-
+       Serial3.println(" WOW let me check this Spot!");
+       
        while(rightDistance == 0 || rightDistance > 30) {
            rightDistance = sideSonar.getMedianDistance();
-          Serial3.println(" Still Checking The SPOT ");
-          
+          Serial3.println(" checking spot! ");   
       }
       
-      spotEndLeft = encoderLeft.getDistance();
-      spotEndRight = encoderRight.getDistance();
+      totalLengthLeft = encoderLeft.getDistance();
+      totalLengthRight = encoderRight.getDistance();
       
-       totalLengthLeft =  (spotEndLeft+spotStartLeft);
-       totalLengthRight = (spotEndRight+spotStartRight);
        
        Serial3.println(" Spot length on right odometer is :");
        Serial3.println(totalLengthRight);
