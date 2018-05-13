@@ -12,7 +12,7 @@ void driveBackward(){
 
 // idea 2:
 // change martin's method in 1 aspect 
-// what: formula to calculate setAngle-parameter
+// what: formula to calculate setAngle-parameter (offset should be signed not unsigned here)
 // result: not known
 // issue: needs testing
 
