@@ -18,6 +18,8 @@ void driveBackward(){
 
 void straightenCar() {
   gyro.update();
+  // question: does it need this line for the offset maybe?
+  // int offset = gyro.calibrate();
   int turn = gyro.getAngularDisplacement();
   Serial3.println("car deviated " + turn);
   delay(500);
