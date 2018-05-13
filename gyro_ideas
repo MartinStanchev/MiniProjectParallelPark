@@ -1,0 +1,30 @@
+// idea 1:
+// what: change the driving forward method by setting an angle
+// result: drives forward straight for ca. 1 meter
+// issue: need to find exact setAngle-parameter next time when having the car
+
+void driveBackward(){
+  car.setSpeed(backwardSpeed);
+  car.setAngle(15);
+}
+
+
+
+// idea 2:
+// change martin's method in 1 aspect 
+// what: formula to calculate setAngle-parameter
+// result: not known
+// issue: needs testing
+
+void straightenCar() {
+  gyro.update();
+  int turn = gyro.getAngularDisplacement();
+  Serial3.println("car deviated " + turn);
+  delay(500);
+    if(turn != offset) {
+      car.setAngle(- (turn - offset));
+    } 
+  }
+  
+  
+  
