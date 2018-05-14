@@ -23,20 +23,18 @@ def shape_compare(c, frame):
 		(x, y, w, h) = cv2.boundingRect(approx)
 		ar = w / float(h)
 
-		if ar >= 0.95 and ar <= 1.05:
-			return "square"
-		else:
+		if ar >= 0.20 and ar <= 0.80:
 			cropped_img = frame[x: x + w, y: y+h]
 
 			maskGreen = cv2.inRange(cropped_img, lower_green_bound, upper_green_bound)
 			green = cv2.countNonZero(maskGreen)
-			if(green > 50):
+			if(green >= 50):
 				print("GREEN LIGHT")
 				return "GreenLight"
 
 			maskRed = cv2.inRange(cropped_img, lower_red_bound, upper_red_bound)
 			red = cv2.countNonZero(maskRed)
-			if(red > 50 & red < 100):
+			if(red >= 50):
 				print("RED LIGHT")
 				return "RedLight"
 
@@ -53,11 +51,11 @@ print("[INFO] starting video stream...")
 vs = VideoStream(src=0).start()
 # vs = VideoStream(usePiCamera=True).start()
 
-lower_green_bound = np.array([15, 100, 15], dtype = "uint8")
-upper_green_bound = np.array([50, 200, 50], dtype = "uint8")
+lower_green_bound = np.array([0, 175, 0], dtype = "uint8")
+upper_green_bound = np.array([100, 255, 100], dtype = "uint8")
 
-lower_red_bound = np.array([15, 15, 100], dtype = "uint8")
-upper_red_bound = np.array([50, 50, 200], dtype = "uint8")
+lower_red_bound = np.array([0, 0, 175], dtype = "uint8")
+upper_red_bound = np.array([100, 100, 255], dtype = "uint8")
 
 
 time.sleep(2.0)
@@ -95,7 +93,7 @@ while True:
 		#Call the method we made above to decide what the shape of a contour is
 		thishape = shape_compare(c, frame)
 
-		if(thishape == "rectangle" or thishape == "RedLight" or thishape == "GreenLight"):
+		if(thishape == "RedLight" or thishape == "GreenLight"):
 			cv2.drawContours(frame, [c], -1, (0, 255, 0), 2)
 
 			cv2.putText(frame, thishape, (cX - 20, cY - 20),
