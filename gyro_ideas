@@ -38,3 +38,20 @@ void straightenCar() {
     else
     car.setMotorSpeed(fSpeed,fSpeed);
   }
+/*
+another method but less suer about it, simply we use the setAngle method to change the anlge
+of driving for the car, we take the AngularDisplacement from the Gyro and change that to a rotation
+degree since the gyro calculate from 0 to 360 without considering direction of rotation. 
+*/
+  void straightenCarAngle(){
+    gyro.update();
+    int gyroAngle = gyro.getAngularDisplacement();
+    if(gyroAngle > 180){
+    angle = 360 - gyroAngle;
+   }
+   else angle = - gyroAngle;
+
+ car.setSpeed(fSpeed);
+ car.setAngle(-angle);
+ delay(300);
+  }
