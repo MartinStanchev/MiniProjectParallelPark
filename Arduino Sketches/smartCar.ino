@@ -7,7 +7,7 @@ Car car;
 SR04 frontSonar;
 SR04 sideSonar;
 SR04 backSonar;
-GP2D120 backIR; 
+GP2D120 backIR;
 Gyroscope gyro(-5);
 
 
@@ -19,7 +19,7 @@ const int rDegrees = 75; //degrees to turn right
 Odometer encoderLeft(210), encoderRight(210);
 Servo myservo;
 
-const int frontTrigPin = 6; 
+const int frontTrigPin = 6;
 const int frontEchoPin = 7;
 const int sideTrigPin = A11;
 const int sideEchoPin = A12;
@@ -38,22 +38,23 @@ int spotSize;
 int backDistanceInCm;
 int frontDistanceInCm;
 int sideDistanceInCm;
-int irDistanceInCm;  
+int irDistanceInCm;
 
 int maxBackDistance = 15;
-int maxFrontDistance = 20; 
+int maxFrontDistance = 20;
 int maxSideDistance = 10;
-int maxIrbackDistance = 8; 
+int maxIrbackDistance = 8;
 
 int pos = 0; // variable to store the servo position
 int const offset = -5;
 
 
 void setup() {
+  Serial.begin(9600);
   Serial3.begin(9600);
   car.begin(); //initialize the car using the encoders and the gyro
   gyro.attach();
-  gyro.begin();   
+  gyro.begin();
   sideSonar.attach(sideTrigPin, sideEchoPin);
   backSonar.attach(backTrigPin, backEchoPin);
   frontSonar.attach(frontTrigPin,frontEchoPin);
@@ -63,36 +64,62 @@ void setup() {
   backIR.attach(backIrPin);
   car.begin(encoderLeft,encoderRight);
   car.begin(gyro);
-  
+
 }
 
 void loop() {
   handleInput();
 }
 
-void handleInput() { //handle serial input if there is any
+/*
+handles input from both the Serial or the usb cable between Pi and Arduino, and the 
+input from the blutooth modeule as Serial3
+*/
+void handleInput() {
   if (Serial3.available()) {
     char input = Serial3.read(); //read everything that has been received so far and log down the last entry
     switch (input) {
-      case 'l': //rotate counter-clockwise going forward
-        car.setSpeed(fSpeed);
-        car.setAngle(lDegrees);
+      case 'A': //rotate counter-clockwise going forward
+        findSpot();
+        delay(1000);
+        parkInSpot();
         break;
+
       case 'r': //turn clock-wise
         car.setSpeed(fSpeed);
         car.setAngle(rDegrees);
         break;
+
       case 's': //go ahead
         car.setSpeed(fSpeed);
-        car.setAngle(12);
+        car.setAngle(0);
         findSpot();
         break;
+
       case 'p': //go back
       parkInSpot();
         break;
       default: //if you receive something that you don't know, just stop
         car.setSpeed(0);
         car.setAngle(0);
+    }
+  }
+
+  if(Serial.available()){
+    String input  = Serial.read();
+    switch (input) {
+
+      case "red":
+      car.setSpeed(0);
+      break;
+
+      case "green":
+      car.setSpeed(fSpeed);
+      break;
+
+      default:
+      car.setSpeed(0);
+
     }
   }
 }
@@ -102,58 +129,58 @@ void findSpot(){
   int spotStartLeft,spotStartRight,spotEndRight,spotEndLeft,rightDistance,totalLengthLeft, totalLengthRight;
 
   while(car.getSpeed()!= 0) {
-    
+
      rightDistance = sideSonar.getMedianDistance();
-    if(rightDistance == 0 || rightDistance > 30){ 
+    if(rightDistance == 0 || rightDistance > 30){
        encoderLeft.begin();
        encoderRight.begin();
-       
+
        Serial3.println(" WOW let me check this Spot!");
-       
+
        while(rightDistance == 0 || rightDistance > 30) {
            rightDistance = sideSonar.getMedianDistance();
-          Serial3.println(" checking spot! ");   
+          Serial3.println(" checking spot! ");
       }
-      
+
       totalLengthLeft = encoderLeft.getDistance();
       totalLengthRight = encoderRight.getDistance();
-      
-       
+
+
        Serial3.println(" Spot length on right odometer is :");
        Serial3.println(totalLengthRight);
        Serial3.println(" Spot length on left odometer is :");
        Serial3.println(totalLengthLeft);
-       
-       
+
+
        if(totalLengthLeft > ENOUGH_SPACE || totalLengthRight > ENOUGH_SPACE) {
         car.setSpeed(0);
         car.setSpeed(0);
         Serial3.println("Stop waiting to park");
         spotSize = fmin(totalLengthLeft,totalLengthRight);
         break;
-      } 
+      }
     }
     else {
       Serial3.println(" NO spot detected ! ");
       car.setSpeed(fSpeed);
       car.setAngle(0);
-      
+
     }
   }
 
- 
+
 }
 
 void driveBackwardOnSpot(){
-  
+
   irDistanceInCm = backIR.getDistance();
   backDistanceInCm = backSonar.getDistance();
-  
+
   myservo.write(0);
   delay(500);
-  
+
     if((backIR.getMedianDistance() > maxIrbackDistance  || backIR.getMedianDistance()==0) && (backSonar.getMedianDistance() > maxBackDistance || backSonar.getMedianDistance() ==0)){
-    
+
     car.setSpeed(bSpeed);
     car.setAngle(0);
 
@@ -161,12 +188,12 @@ void driveBackwardOnSpot(){
 //      irDistanceInCm = backIR.getMedianDistance();
 //      backDistanceInCm = backSonar.getMedianDistance();
       if((backIR.getMedianDistance() < maxIrbackDistance  && backIR.getMedianDistance()!=0)||(backSonar.getMedianDistance() < maxBackDistance && backSonar.getMedianDistance() !=0)){
-        car.setSpeed(0); 
+        car.setSpeed(0);
         break;
       }
-      
+
     }
-    
+
   }
   else {
     car.setSpeed(0);
@@ -175,13 +202,13 @@ void driveBackwardOnSpot(){
 
   delay(500);
   myservo.write(55);
-  
- 
+
+
  }
- 
+
 void parkInSpot(){
 
-  int rotateDegree = -35;  
+  int rotateDegree = -35;
   gyro.update();
   Serial3.println(gyro.getAngularDisplacement());
   driveBack();
@@ -206,35 +233,35 @@ void parkInSpot(){
 }
 
 void rotateOnSpot(int targetDegrees) {
-  targetDegrees %= 360; 
+  targetDegrees %= 360;
   if (!targetDegrees){
-     return; 
+     return;
   }
-  if (targetDegrees > 0) { 
-    car.setMotorSpeed(fSpeed, 0); 
-  } else { 
-    car.setMotorSpeed(-fSpeed, fSpeed); 
+  if (targetDegrees > 0) {
+    car.setMotorSpeed(fSpeed, 0);
+  } else {
+    car.setMotorSpeed(-fSpeed, fSpeed);
   }
-  
-  unsigned int initialHeading = gyro.getAngularDisplacement(); 
-  int degreesTurnedSoFar = 0; 
-  
-  while (abs(degreesTurnedSoFar) < abs(targetDegrees)) { 
+
+  unsigned int initialHeading = gyro.getAngularDisplacement();
+  int degreesTurnedSoFar = 0;
+
+  while (abs(degreesTurnedSoFar) < abs(targetDegrees)) {
     gyro.update();
-    int currentHeading = gyro.getAngularDisplacement(); 
-    
-    if ((targetDegrees < 0) && (currentHeading > initialHeading)) { 
-      currentHeading -= 360; 
+    int currentHeading = gyro.getAngularDisplacement();
+
+    if ((targetDegrees < 0) && (currentHeading > initialHeading)) {
+      currentHeading -= 360;
     } else if ((targetDegrees > 0) && (currentHeading < initialHeading)) {
       currentHeading += 360;
     }
-    
-    degreesTurnedSoFar = initialHeading - currentHeading;   
+
+    degreesTurnedSoFar = initialHeading - currentHeading;
   }
  car.setSpeed(0);
 }
 
- // Not sure yet if this works! 
+ // Not sure yet if this works!
 void straightenCar() {
   gyro.update();
   int turn = gyro.getAngularDisplacement();
@@ -245,7 +272,7 @@ void straightenCar() {
   } else if(turn < offset) {
     car.setAngle(-turn -offset);
   }
-  
+
 }
 
 void middlePark(){
@@ -255,7 +282,7 @@ void middlePark(){
   int backDistance = backSonar.getMedianDistance();
   Serial3.println("the back distance is");
   Serial3.println(backDistance);
-  
+
   int distanceToGo =  frontDistance - backDistance ;
   Serial3.println("the To GO distance is");
   Serial3.println(distanceToGo/2);
@@ -274,6 +301,5 @@ void driveBack(){
   sideDistanceInCm = sideSonar.getMedianDistance();
   if(sideDistanceInCm < 30 && sideDistanceInCm != 0)
   car.go(-3);
-  
-}
 
+}
