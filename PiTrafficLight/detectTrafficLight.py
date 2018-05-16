@@ -9,6 +9,8 @@ import argparse
 import imutils
 import time
 import cv2
+import serial
+
 
 def shape_compare(c, frame):
 
@@ -50,6 +52,16 @@ print("[INFO] starting video stream...")
 #comment first line and uncomment second one to use the PI camera module instead of laptops webcam
 vs = VideoStream(src=0).start()
 # vs = VideoStream(usePiCamera=True).start()
+
+
+#serial connection arduino
+
+try:
+	serial_arduino = serial.Serial('/dev/ttyACM0', 9600)
+except Exception:
+	serial_arduino = serial.Serial('/dev/ttyACM1', 9600)
+
+	
 
 lower_green_bound = np.array([0, 175, 0], dtype = "uint8")
 upper_green_bound = np.array([100, 255, 100], dtype = "uint8")
