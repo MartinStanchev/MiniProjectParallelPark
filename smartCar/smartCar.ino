@@ -94,6 +94,21 @@ void handleInput() { //handle serial input if there is any
         car.setAngle(0);
     }
   }
+  
+     if (Serial.available()) {
+    String inputRPi = Serial.readStringUntil('\n');
+     
+    if (inputRPi==("red")) {
+       car.setSpeed(0);     
+    }
+    else if (inputRPi==("green")) {
+     car.setSpeed(fSpeed) ;  
+    }
+    else {
+      car.setSpeed(0);
+    }
+  }
+    
 }
 
 void findSpot(){
