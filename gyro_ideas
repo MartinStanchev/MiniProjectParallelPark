@@ -11,22 +11,30 @@ void driveBackward(){
 
 
 // idea 2:
-// change martin's method in 1 aspect 
+// change martin's method in 1 aspect
 // what: formula to calculate setAngle-parameter (offset should be signed not unsigned here)
 // result: not known
 // issue: needs testing
 
+
+
+/*
+this a method that makes the car dirve straight forward by taking the getAngularDisplacement form
+the Gyro and then setting the appropriate motor speed on both sides of the car.
+the car deviated to left when the displacement between 0 and 180 thus we increase the speed on the left
+motor and decrease on the right motor and vice versa!
+*/
 void straightenCar() {
   gyro.update();
-  // question: does it need this line for the offset maybe?
-  // int offset = gyro.calibrate();
   int turn = gyro.getAngularDisplacement();
   Serial3.println("car deviated " + turn);
-  delay(500);
-    if(turn != offset) {
-      car.setAngle(- (turn - offset));
-    } 
+  if(turn > 2 && turn < 180){
+    car.setMotorSpeed(fSpeed,fSpeed/1.5);
+
   }
-  
-  
-  
+    else if (turn > 180 && turn < 358) {
+      car.setMotorSpeed(fSpeed/1.5,fSpeed);
+    }
+    else
+    car.setMotorSpeed(fSpeed,fSpeed);
+  }
