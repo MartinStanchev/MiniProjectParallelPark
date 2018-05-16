@@ -66,7 +66,7 @@ void setup() {
   car.begin(gyro);
 
 }
-
+// what is executed here depends on the input of the user
 void loop() {
   handleInput();
 }
@@ -124,20 +124,22 @@ void handleInput() {
   }
 }
 
+/* method to find a sufficiently large spot
+where the car can park later on */
 void findSpot(){
-  const int ENOUGH_SPACE = 45;
+  const int ENOUGH_SPACE = 45;  
   int spotStartLeft,spotStartRight,spotEndRight,spotEndLeft,rightDistance,totalLengthLeft, totalLengthRight;
 
   while(car.getSpeed()!= 0) {
 
      rightDistance = sideSonar.getMedianDistance();
-    if(rightDistance == 0 || rightDistance > 30){
+    if(rightDistance == 0 || rightDistance > 30){ // start measuring distance of gap, once a gap is found
        encoderLeft.begin();
        encoderRight.begin();
 
        Serial3.println(" WOW let me check this Spot!");
 
-       while(rightDistance == 0 || rightDistance > 30) {
+       while(rightDistance == 0 || rightDistance > 30) {  // keep measuring gap
            rightDistance = sideSonar.getMedianDistance();
           Serial3.println(" checking spot! ");
       }
@@ -152,7 +154,7 @@ void findSpot(){
        Serial3.println(totalLengthLeft);
 
 
-       if(totalLengthLeft > ENOUGH_SPACE || totalLengthRight > ENOUGH_SPACE) {
+       if(totalLengthLeft > ENOUGH_SPACE || totalLengthRight > ENOUGH_SPACE) { // stop when gap length is bigger than set value for minimum spotsize
         car.setSpeed(0);
         car.setSpeed(0);
         Serial3.println("Stop waiting to park");
@@ -161,8 +163,8 @@ void findSpot(){
       }
     }
     else {
-      Serial3.println(" NO spot detected ! ");
-      car.setSpeed(fSpeed);
+      Serial3.println(" NO spot detected ! "); // if gap is found but is less than set value for minimum spotsize, it is not recognized as a parking spot
+      car.setSpeed(fSpeed); // hen car keeps driving forward
       car.setAngle(0);
 
     }
@@ -206,6 +208,7 @@ void driveBackwardOnSpot(){
 
  }
 
+// method to park the car once i stopped after finding a parking spot
 void parkInSpot(){
 
   int rotateDegree = -35;
@@ -262,6 +265,7 @@ void rotateOnSpot(int targetDegrees) {
 }
 
  // Not sure yet if this works!
+// attempt to compensate for the car that is does not drive straight on its own
 void straightenCar() {
   gyro.update();
   int turn = gyro.getAngularDisplacement();
@@ -275,6 +279,8 @@ void straightenCar() {
 
 }
 
+// once the car is parked in the spot this method is called to 
+// make the car position itself in the middle between the two objects on the front and back
 void middlePark(){
   int frontDistance = frontSonar.getMedianDistance();
   Serial3.println("the front distance is");
