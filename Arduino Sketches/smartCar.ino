@@ -10,14 +10,12 @@ SR04 backSonar;
 GP2D120 backIR;
 Gyroscope gyro(-5);
 
-
+//Setting needed constants
 const int fSpeed = 30; //70% of the full speed forward
 const int bSpeed = -25; //70% of the full speed backward
 const int lDegrees = -75; //degrees to turn left
 const int rDegrees = 75; //degrees to turn right
 
-Odometer encoderLeft(210), encoderRight(210);
-Servo myservo;
 
 const int frontTrigPin = 6;
 const int frontEchoPin = 7;
@@ -31,9 +29,14 @@ const int backIrPin = A0;
 const int encoderLeftPin = 2;
 const int encoderRightPin = 3;
 
-
+int const offset = -5;
 const int SERVO_PIN = 50;
 
+//Initializing odometer and servo
+Odometer encoderLeft(210), encoderRight(210);
+Servo myservo;
+
+//Setting needed variables
 int spotSize;
 int backDistanceInCm;
 int frontDistanceInCm;
@@ -45,14 +48,14 @@ int maxFrontDistance = 20;
 int maxSideDistance = 10;
 int maxIrbackDistance = 8;
 
-int pos = 0; // variable to store the servo position
-int const offset = -5;
+int pos = 0; // Variable to store the servo position
+
 
 
 void setup() {
   Serial.begin(9600);
   Serial3.begin(9600);
-  car.begin(); //initialize the car using the encoders and the gyro
+  car.begin(); //Initialize the car using the encoders and the gyro
   gyro.attach();
   gyro.begin();
   sideSonar.attach(sideTrigPin, sideEchoPin);
@@ -64,42 +67,43 @@ void setup() {
   backIR.attach(backIrPin);
   car.begin(encoderLeft,encoderRight);
   car.begin(gyro);
-
 }
-// what is executed here depends on the input of the user
+
+// What is executed here depends on the input of the user.
 void loop() {
   handleInput();
 }
 
+
 /*
-handles input from both the Serial or the usb cable between Pi and Arduino, and the 
-input from the blutooth modeule as Serial3
+This method handles input from both the Serial or the USB Cable between the Raspberry Pi and Arduino, and the 
+input from the Blutooth modeule as Serial3.
 */
 void handleInput() {
   if (Serial3.available()) {
-    char input = Serial3.read(); //read everything that has been received so far and log down the last entry
+    char input = Serial3.read(); //Read everything that has been received so far and log down the last entry.
     switch (input) {
-      case 'A': //rotate counter-clockwise going forward
+      case 'A': //Find spot and park in spot
         findSpot();
         delay(1000);
         parkInSpot();
         break;
 
-      case 'r': //turn clock-wise
+      case 'r': //Turn clock-wise
         car.setSpeed(fSpeed);
         car.setAngle(rDegrees);
         break;
 
-      case 's': //go ahead
+      case 's': //Go forward and look for parking spot
         car.setSpeed(fSpeed);
         car.setAngle(0);
         findSpot();
         break;
 
-      case 'p': //go back
+      case 'p': //Park in spot
       parkInSpot();
         break;
-      default: //if you receive something that you don't know, just stop
+      default: //If input is something that is not 'a', 'r', 's', or 'p', the car stops
         car.setSpeed(0);
         car.setAngle(0);
     }
@@ -124,22 +128,21 @@ void handleInput() {
   }
 }
 
-/* method to find a sufficiently large spot
-where the car can park later on */
+// Method to find a sufficiently large parking spot (50cm).
 void findSpot(){
-  const int ENOUGH_SPACE = 45;  
+  const int ENOUGH_SPACE = 45;                            //Value for minimum spot length that is enough to park in
   int spotStartLeft,spotStartRight,spotEndRight,spotEndLeft,rightDistance,totalLengthLeft, totalLengthRight;
 
   while(car.getSpeed()!= 0) {
 
      rightDistance = sideSonar.getMedianDistance();
-    if(rightDistance == 0 || rightDistance > 30){ // start measuring distance of gap, once a gap is found
+    if(rightDistance == 0 || rightDistance > 30){         // Start measuring distance of gap, once a gap is found.
        encoderLeft.begin();
        encoderRight.begin();
 
        Serial3.println(" WOW let me check this Spot!");
 
-       while(rightDistance == 0 || rightDistance > 30) {  // keep measuring gap
+       while(rightDistance == 0 || rightDistance > 30) {  // Keep measuring gap.
            rightDistance = sideSonar.getMedianDistance();
           Serial3.println(" checking spot! ");
       }
@@ -154,7 +157,7 @@ void findSpot(){
        Serial3.println(totalLengthLeft);
 
 
-       if(totalLengthLeft > ENOUGH_SPACE || totalLengthRight > ENOUGH_SPACE) { // stop when gap length is bigger than set value for minimum spotsize
+       if(totalLengthLeft > ENOUGH_SPACE || totalLengthRight > ENOUGH_SPACE) { //Stop when gap length is bigger than set value for minimum spotsize.
         car.setSpeed(0);
         car.setSpeed(0);
         Serial3.println("Stop waiting to park");
@@ -163,8 +166,8 @@ void findSpot(){
       }
     }
     else {
-      Serial3.println(" NO spot detected ! "); // if gap is found but is less than set value for minimum spotsize, it is not recognized as a parking spot
-      car.setSpeed(fSpeed); // hen car keeps driving forward
+      Serial3.println(" NO spot detected ! ");              //If gap is found but is less than set value for minimum spotsize, it is not recognized as a parking spot.
+      car.setSpeed(fSpeed);                                 //The car keeps driving forward.
       car.setAngle(0);
 
     }
