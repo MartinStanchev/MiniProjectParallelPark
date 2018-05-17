@@ -28,15 +28,29 @@ def shape_compare(c, frame):
 
 			maskGreen = cv2.inRange(cropped_img, lower_green_bound, upper_green_bound)
 			green = cv2.countNonZero(maskGreen)
-			if(green >= 50):
-				print("GREEN LIGHT")
-				return "GreenLight"
+			# if(green >= 50):
+			# 	print("GREEN LIGHT")
+			# 	return "GreenLight"
 
 			maskRed = cv2.inRange(cropped_img, lower_red_bound, upper_red_bound)
 			red = cv2.countNonZero(maskRed)
-			if(red >= 50):
+			# if(red >= 50):
+			# 	print("RED LIGHT")
+			# 	return "RedLight"
+			if(red > green and red >= 50):
 				print("RED LIGHT")
+
+				byte_speed = str.encode('m' + '\n')
+				serial_arduino.write(byte_speed)
+
 				return "RedLight"
+			elif(green > red and green >= 50):
+				print("GREEN LIGHT")
+
+				byte_speed = str.encode('f' + '\n')
+				serial_arduino.write(byte_speed)
+
+				return "GreenLight"
 
 			return "rectangle"
 
@@ -59,12 +73,12 @@ try:
 except Exception:
 	serial_arduino = serial.Serial('/dev/ttyACM1', 9600)
 
-	
 
-lower_green_bound = np.array([0, 175, 0], dtype = "uint8")
+
+lower_green_bound = np.array([0, 150, 0], dtype = "uint8")
 upper_green_bound = np.array([100, 255, 100], dtype = "uint8")
 
-lower_red_bound = np.array([0, 0, 175], dtype = "uint8")
+lower_red_bound = np.array([0, 0, 100], dtype = "uint8")
 upper_red_bound = np.array([100, 100, 255], dtype = "uint8")
 
 
