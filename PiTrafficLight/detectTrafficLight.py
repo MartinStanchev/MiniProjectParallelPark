@@ -9,8 +9,6 @@ import argparse
 import imutils
 import time
 import cv2
-import serial
-
 
 def shape_compare(c, frame):
 
