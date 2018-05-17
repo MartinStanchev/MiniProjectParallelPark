@@ -1,7 +1,6 @@
 #include <Smartcar.h>
 
-//000000000000-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0
-// jjjjjjjjjjjjjjj
+
 Car car;
 
 SR04 frontSonar;
@@ -127,13 +126,14 @@ if (sideDistanceInCm < backDistanceInCm) {
 
 
     
-//}
-//   else if (sideDistanceInCm > backDistanceInCm) { .   // the code inside the else if statement is reducing the chances for a successful parallel position (needs to be updated)
-//      gyro.update();
-//  Serial.println(gyro.getAngularDisplacement());
-//  delay(1000);
-//      
-//      }
+}
+  else if (sideDistanceInCm > backDistanceInCm) {   
+      rotateOnSpot(rightTurn/2);
+       gyro.update();
+ Serial.println(gyro.getAngularDisplacement());
+ delay(1000);
+     
+     }
 
      else {
     car.setSpeed(0);
