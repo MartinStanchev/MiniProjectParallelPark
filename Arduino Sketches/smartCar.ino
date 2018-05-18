@@ -11,10 +11,10 @@ GP2D120 backIR;
 Gyroscope gyro(-5);
 
 //Setting needed constants
-const int fSpeed = 30; //70% of the full speed forward
-const int bSpeed = -25; //70% of the full speed backward
-const int lDegrees = -75; //degrees to turn left
-const int rDegrees = 75; //degrees to turn right
+const int fSpeed = 30; 
+const int bSpeed = -25;
+const int lDegrees = -75; 
+const int rDegrees = 75; 
 
 
 const int frontTrigPin = 6;
@@ -50,7 +50,7 @@ int maxIrbackDistance = 8;
 
 int pos = 0; // Variable to store the servo position
 
-
+boolean isOn = false;
 
 void setup() {
   Serial.begin(9600);
@@ -101,25 +101,39 @@ void handleInput() {
         break;
 
       case 'p': //Park in spot
-      parkInSpot();
+         parkInSpot();
         break;
+        
       default: //If input is something that is not 'a', 'r', 's', or 'p', the car stops
         car.setSpeed(0);
         car.setAngle(0);
     }
   }
-
+  //If you have contact with the Raspberry Pi, see if it sends you some input//
   if(Serial.available()){
     String input  = Serial.read();
     switch (input) {
 
-      case "red":
-      car.setSpeed(0);
+      case "1": //green sign
+        if(!isOn){
+          car.setSpeed(fSpeed);
+          isOn = true;
+        }
+     //else do nothing, because the car is already driving
       break;
 
-      case "green":
-      car.setSpeed(fSpeed);
+      case "0": //red sign
+        if(isOn){
+          car.setSpeed(0);
+          isOn = false;  
+        }
+      //else do nothing, because the car has already stopped
       break;
+        
+      case "3": //we want the car to just drive forward and start looking for signs when we start the camera program
+         car.setSpeed(fSpeed);
+         isOn = true;
+      break;  
 
       default:
       car.setSpeed(0);
