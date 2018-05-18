@@ -17,7 +17,15 @@ void driveBackward(){
 // result: not known
 // issue: needs testing
 
-
+void straightenCar() {
+  gyro.update();
+  int offset = gyro.calibrate();
+  int turn = gyro.getAngularDisplacement();
+  Serial.println("car deviated " + turn);
+  if(turn != offset) {
+    car.setAngle(- (turn - offset));
+  }
+}
 
 /*
 this a method that makes the car dirve straight forward by taking the getAngularDisplacement form
