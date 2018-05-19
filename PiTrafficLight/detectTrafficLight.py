@@ -9,6 +9,9 @@ import argparse
 import imutils
 import time
 import cv2
+import serial
+
+time.sleep(2.0)
 
 def shape_compare(c, frame):
 
@@ -39,16 +42,16 @@ def shape_compare(c, frame):
 			# 	return "RedLight"
 			if(red > green and red >= 50):
 				print("RED LIGHT")
-
-				byte_speed = str.encode('m' + '\n')
-				serial_arduino.write(byte_speed)
+				arduino_serial.write(b'0')
+				#byte_speed = str.encode('m' + '\n')
+				#serial_arduino.write(byte_speed)
 
 				return "RedLight"
 			elif(green > red and green >= 50):
 				print("GREEN LIGHT")
-
-				byte_speed = str.encode('f' + '\n')
-				serial_arduino.write(byte_speed)
+				arduino_serial.write(b'1')	
+				#byte_speed = str.encode('f' + '\n')
+				#serial_arduino.write(byte_speed)
 
 				return "GreenLight"
 
@@ -67,20 +70,24 @@ vs = VideoStream(src=0).start()
 
 
 #serial connection arduino
-
 try:
 	serial_arduino = serial.Serial('/dev/ttyACM0', 9600)
 except Exception:
 	serial_arduino = serial.Serial('/dev/ttyACM1', 9600)
 
-
-
+#Colors to find	
 lower_green_bound = np.array([0, 150, 0], dtype = "uint8")
 upper_green_bound = np.array([100, 255, 100], dtype = "uint8")
 
 lower_red_bound = np.array([0, 0, 100], dtype = "uint8")
 upper_red_bound = np.array([100, 100, 255], dtype = "uint8")
 
+#Other colors values if the ones above dont work
+#lower_green_bound = np.array([29, 100, 21], dtype = "uint8") #mid was 130, then 100 before!
+#upper_green_bound = np.array([83, 250, 106], dtype = "uint8")
+
+#lower_red_bound = np.array([15, 15, 100], dtype = "uint8")
+#upper_red_bound = np.array([50, 50, 200], dtype = "uint8")
 
 time.sleep(2.0)
 fps = FPS().start()
