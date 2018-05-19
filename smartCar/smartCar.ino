@@ -98,10 +98,10 @@ void handleInput() { //handle serial input if there is any
      if (Serial.available()) {
     String inputRPi = Serial.readStringUntil('\n');
      
-    if (inputRPi==("red")) {
+    if (inputRPi==("redLight")) {
        car.setSpeed(0);     
     }
-    else if (inputRPi==("green")) {
+    else if (inputRPi==("greenLight")) {
      car.setSpeed(fSpeed) ;  
     }
     else {
