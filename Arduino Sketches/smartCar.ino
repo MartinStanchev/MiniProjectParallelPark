@@ -111,10 +111,10 @@ void handleInput() {
   }
   //If you have contact with the Raspberry Pi, see if it sends you some input//
   if(Serial.available()){
-    String input  = Serial.read();
+    int input  = Serial.read();
     switch (input) {
 
-      case "1": //green sign
+      case '1': //green sign
         if(!isOn){
           car.setSpeed(fSpeed);
           isOn = true;
@@ -122,7 +122,7 @@ void handleInput() {
      //else do nothing, because the car is already driving
       break;
 
-      case "0": //red sign
+      case '0': //red sign
         if(isOn){
           car.setSpeed(0);
           isOn = false;  
@@ -130,7 +130,7 @@ void handleInput() {
       //else do nothing, because the car has already stopped
       break;
         
-      case "3": //we want the car to just drive forward and start looking for signs when we start the camera program
+      case '3': //we want the car to just drive forward and start looking for signs when we start the camera program
          car.setSpeed(fSpeed);
          isOn = true;
       break;  
