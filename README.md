@@ -9,5 +9,5 @@ smartCar.ino also contains the Arduino code needed to make the car respond to ca
 <br>
 <br>
 Object detection python file:<br>
-NAME PLACE
+detectTrafficLight.py in the folder "PiTrafficLight" is the main object detection python file in use. This file should be available and run from the Raspberry Pi computer connected to the Arduino.
 (update when name has been set and its been uploaded to master branch in the correct folder)
