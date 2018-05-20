@@ -83,7 +83,7 @@ void handleInput() {
   if (Serial3.available()) {
     char input = Serial3.read(); //Read everything that has been received so far and log down the last entry.
     switch (input) {
-      case 'A': //Find spot and park in spot
+      case 'a': //Find spot and park in spot
         findSpot();
         delay(1000);
         parkInSpot();
